@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>body{margin:0}[hidden]{display:none!important}</style>
+<title>Negative Numbers Toolkit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap">
+<style>
+/* Layout: one projector screen (4:3 friendly). Navy header with tabs, big visual in the middle, controls along the bottom. Single light theme on purpose, to match the lesson slides. */
+:root{
+  --sky:#DEEAF6;      /* light blue, same as the slide boxes */
+  --navy:#002060;     /* slide text */
+  --blue:#3D85C6;
+  --red:#C0392B;      /* negatives, subtract, cooling */
+  --warm:#E0442E;     /* mercury */
+  --cool:#2F7BC4;     /* cooling jumps */
+  --start:#E67E22;    /* orange start dot, as on slide 9 */
+  --answer:#2E8B57;   /* green answer dot */
+  --card:#FFFFFF;
+  --line:#9DB7D6;
+  --muted:#4A5C80;
+  --salmon:#FF8B8B;
+  --font:"Lexend",Calibri,"Segoe UI",Arial,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--sky);color:var(--navy);font-family:var(--font);font-size:16px;display:flex;flex-direction:column}
+button,select{font-family:inherit;color:inherit}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header h1{font-size:18px;font-weight:600;margin:0;letter-spacing:.02em;flex:1 1 auto}
+header h1 small{font-weight:400;opacity:.75;font-size:13px;margin-left:8px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{background:transparent;border:2px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:6px 14px;font-size:15px;cursor:pointer}
+.tab[aria-selected="true"]{background:#fff;color:var(--navy);border-color:#fff;font-weight:600}
+.iconbtn{background:transparent;border:2px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px}
+main{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;
+  padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+section.view{flex:1 1 auto;display:flex;flex-direction:column;gap:12px;min-height:0}
+:focus-visible{outline:3px solid var(--start);outline-offset:2px}
+
+/* equation + story */
+.eq{font-size:clamp(34px,6.2vw,64px);font-weight:700;text-align:center;line-height:1.1;font-variant-numeric:tabular-nums;min-height:1.1em}
+.eq .neg{color:var(--red)}
+.eq .ans{color:var(--answer)}
+.eq .q{color:var(--muted);opacity:.6}
+.eq .rw{display:block;font-size:.55em;color:var(--muted);font-weight:600;margin-top:4px}
+.story{text-align:center;font-size:clamp(17px,2.3vw,24px);min-height:1.4em;color:var(--navy)}
+.story b.r{color:var(--blue)} .story b.l{color:var(--red)}
+.story b.up{color:var(--warm)} .story b.down{color:var(--cool)}
+
+.stage{background:var(--card);border-radius:14px;border:2px solid var(--line);flex:1 1 auto;min-height:180px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.stage svg{width:100%;height:100%;display:block}
+.legend{position:absolute;left:14px;bottom:10px;font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+
+/* controls */
+.controls{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;justify-content:center}
+.group{display:flex;flex-direction:column;gap:4px;align-items:center}
+.group>.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.stepper{display:flex;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.stepper button{border:0;background:transparent;font-size:22px;width:40px;height:44px;cursor:pointer;color:var(--navy)}
+.stepper button:hover{background:var(--sky)}
+.stepper output{min-width:58px;text-align:center;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.seg{display:flex;background:var(--card);border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:0 14px;height:44px;font-size:17px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff;font-weight:600}
+.chk{display:flex;align-items:center;gap:6px;height:44px;font-size:15px;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:0 12px;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--red)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn{border:0;border-radius:10px;height:48px;padding:0 18px;font-size:17px;font-weight:600;cursor:pointer;background:var(--card);border:2px solid var(--line);color:var(--navy)}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn.go{background:var(--answer);color:#fff;border-color:var(--answer)}
+.btn:disabled{opacity:.4;cursor:default}
+select.preset{height:44px;border-radius:10px;border:2px solid var(--line);background:var(--card);font-size:15px;padding:0 8px;max-width:100%}
+.warn{color:var(--red);font-size:14px;text-align:center;min-height:1.2em}
+.hint{font-size:12px;color:var(--muted);text-align:center}
+
+/* thermometer layout */
+.thermo-wrap{flex:1 1 auto;display:grid;grid-template-columns:minmax(200px,34%) 1fr;gap:16px;min-height:0}
+.thermo-wrap .stage{min-height:360px}
+.thermo-side{display:flex;flex-direction:column;gap:12px;min-width:0;justify-content:center}
+.scenario{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px 18px;font-size:clamp(18px,2.4vw,26px);line-height:1.35}
+.scenario .city{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
+.readout{font-size:clamp(46px,8vw,88px);font-weight:700;text-align:center;font-variant-numeric:tabular-nums;line-height:1}
+.readout.neg{color:var(--red)}
+.thermo-side .controls{justify-content:flex-start}
+.thermo-side .actions{justify-content:flex-start}
+
+@media (max-width:640px){
+  .thermo-wrap{grid-template-columns:1fr}
+  .thermo-wrap .stage{min-height:420px}
+  .stepper output{min-width:46px;font-size:20px}
+  .legend{position:static;padding:6px 10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><body>
+
+<header>
+  <h1>Negative numbers <small>Start · Sign · Jumps</small></h1>
+  <nav class="tabs" role="tablist" aria-label="Tools">
+    <button class="tab" role="tab" id="tab-line" aria-controls="view-line" data-view="number-line">Number line</button>
+    <button class="tab" role="tab" id="tab-thermo" aria-controls="view-thermo" data-view="thermometer">Thermometer</button>
+  </nav>
+  <button class="iconbtn" id="fs" title="Full screen">⛶ Full screen</button>
+</header>
+
+<main>
+<!-- ============ NUMBER LINE ============ -->
+<section class="view" id="view-line" role="tabpanel" aria-labelledby="tab-line">
+  <div class="eq" id="nl-eq" aria-live="polite"></div>
+  <div class="story" id="nl-story" aria-live="polite"></div>
+  <div class="stage">
+    <svg id="nl-svg" viewBox="0 0 1000 250" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Number line"></svg>
+    <div class="legend"><span><i class="dot" style="background:var(--start)"></i>start</span><span><i class="dot" style="background:var(--answer)"></i>answer</span><span><i class="dot" style="background:var(--blue)"></i>move right</span><span><i class="dot" style="background:var(--red)"></i>move left</span></div>
+  </div>
+  <div class="warn" id="nl-warn"></div>
+  <div class="controls">
+    <div class="group"><span class="lbl">Start</span>
+      <div class="stepper"><button id="nl-a-dn" aria-label="Start down">−</button><output id="nl-a"></output><button id="nl-a-up" aria-label="Start up">+</button></div></div>
+    <div class="group"><span class="lbl">Sign</span>
+      <div class="seg"><button id="nl-op-add" aria-pressed="true">+ add</button><button id="nl-op-sub" aria-pressed="false">− subtract</button></div></div>
+    <div class="group"><span class="lbl">Number</span>
+      <div class="stepper"><button id="nl-b-dn" aria-label="Number down">−</button><output id="nl-b"></output><button id="nl-b-up" aria-label="Number up">+</button></div></div>
+    <div class="group"><span class="lbl">&nbsp;</span>
+      <label class="chk"><input type="checkbox" id="nl-bneg"> make it (−)</label></div>
+    <div class="group"><span class="lbl">Questions</span>
+      <select class="preset" id="nl-preset" aria-label="Lesson questions"></select></div>
+  </div>
+  <div class="actions">
+    <button class="btn" id="nl-back">◀ Back</button>
+    <button class="btn primary" id="nl-next">Next step ▶</button>
+    <button class="btn go" id="nl-play">Play all</button>
+    <button class="btn" id="nl-reset">Reset</button>
+    <button class="btn" id="nl-rand-m">🌶 Random</button>
+    <button class="btn" id="nl-rand-md">🌶🌶</button>
+    <button class="btn" id="nl-rand-h">🌶🌶🌶</button>
+  </div>
+  <div class="hint">Tip: tap a number on the line to start there. Clicker or arrow keys: → next step, ← back. Enter plays it all.</div>
+</section>
+
+<!-- ============ THERMOMETER ============ -->
+<section class="view" id="view-thermo" role="tabpanel" aria-labelledby="tab-thermo" hidden>
+  <div class="thermo-wrap">
+    <div class="stage"><svg id="th-svg" viewBox="0 0 320 640" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Thermometer"></svg></div>
+    <div class="thermo-side">
+      <div class="scenario" id="th-scn"></div>
+      <div class="readout" id="th-read" aria-live="polite"></div>
+      <div class="story" id="th-story" aria-live="polite" style="text-align:left"></div>
+      <div class="warn" id="th-warn" style="text-align:left"></div>
+      <div class="controls">
+        <div class="group"><span class="lbl">Start (°C)</span>
+          <div class="stepper"><button id="th-a-dn" aria-label="Start down">−</button><output id="th-a"></output><button id="th-a-up" aria-label="Start up">+</button></div></div>
+        <div class="group"><span class="lbl">Change</span>
+          <div class="seg"><button id="th-up" aria-pressed="true">warms up</button><button id="th-down" aria-pressed="false">cools down</button></div></div>
+        <div class="group"><span class="lbl">By (°C)</span>
+          <div class="stepper"><button id="th-b-dn" aria-label="Change down">−</button><output id="th-b"></output><button id="th-b-up" aria-label="Change up">+</button></div></div>
+      </div>
+      <div class="controls">
+        <div class="group" style="align-items:flex-start"><span class="lbl">Places</span>
+          <select class="preset" id="th-preset" aria-label="Places"></select></div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="th-back">◀ Back</button>
+        <button class="btn primary" id="th-next">Next degree ▶</button>
+        <button class="btn go" id="th-play">Play all</button>
+        <button class="btn" id="th-reset">Reset</button>
+      </div>
+      <div class="hint" style="text-align:left">Tip: tap the scale to set the start. A thermometer is a number line standing up.</div>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+var M="−"; // proper minus sign
+function fmt(n){return n<0? M+Math.abs(n) : String(n);}
+function fmtB(n){return n<0? "("+M+Math.abs(n)+")" : String(n);}
+function neg(n){return n<0?'<span class="neg">'+fmt(n)+'</span>':fmt(n);}
+function negB(n){return n<0?'(<span class="neg">'+fmt(n)+'</span>)':fmt(n);}
+function $(id){return document.getElementById(id);}
+var NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent,text){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;}
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function tween(ms,fn,done){if(reduce){fn(1);done&&done();return function(){};}var t0=null,stop=false;function f(ts){if(stop)return;if(t0==null)t0=ts;var t=Math.min(1,(ts-t0)/ms);fn(t);if(t<1)requestAnimationFrame(f);else done&&done();}requestAnimationFrame(f);return function(){stop=true;};}
+var css=getComputedStyle(document.documentElement);
+function C(n){return css.getPropertyValue("--"+n).trim();}
+
+/* ================= NUMBER LINE ================= */
+var nl={a:-3,op:"+",b:5,step:0,timer:null,cancel:null};
+var nlPresets=[
+ ["Worked example: −3 + 5",-3,"+",5],["Worked example: −2 − 4",-2,"-",4],
+ ["Do Now d) Start at −2, 4 right",-2,"+",4],["Do Now c) 5 − 7 (temperature)",5,"-",7],
+ ["Whiteboards a) −4 + 3",-4,"+",3],["Whiteboards b) 2 − 6",2,"-",6],["Whiteboards c) −1 − 3",-1,"-",3],["Whiteboards d) −5 + 5",-5,"+",5],
+ ["Hinge 1: −3 − 4",-3,"-",4],
+ ["Pattern: 5 + (−1)",5,"+",-1],["Pattern: 5 + (−2)",5,"+",-2],["Pattern: 5 − (−1)",5,"-",-1],["Pattern: 5 − (−2)",5,"-",-2],
+ ["Rewrite: 5 + (−3)",5,"+",-3],["Rewrite: −2 + (−4)",-2,"+",-4],["Rewrite: 3 − (−2)",3,"-",-2],["Rewrite: −4 − (−6)",-4,"-",-6],
+ ["Your turn a) 6 + (−4)",6,"+",-4],["Your turn b) −1 + (−2)",-1,"+",-2],["Your turn c) 2 − (−3)",2,"-",-3],["Your turn d) −5 − (−2)",-5,"-",-2],
+ ["Hinge 2: −2 − (−5)",-2,"-",-5],
+ ["Spot the mistake: −6 − 8",-6,"-",8],["Spot the mistake: −12 − (−5)",-12,"-",-5],
+ ["Exit 1) −2 + 6",-2,"+",6],["Exit 2) 3 − 8",3,"-",8],["Exit 3) 4 + (−7)",4,"+",-7],["Exit 4) −2 − (−6)",-2,"-",-6],["Exit 5★) 1 − (−4)",1,"-",-4]
+];
+var sel=$("nl-preset");
+el; var o0=document.createElement("option");o0.textContent="Lesson questions…";o0.value="";sel.appendChild(o0);
+nlPresets.forEach(function(p,i){var o=document.createElement("option");o.value=i;o.textContent=p[0];sel.appendChild(o);});
+
+function nlDir(){ // +1 right, -1 left
+  var right=(nl.op==="+")===(nl.b>=0); return right?1:-1;}
+function nlTwoSigns(){return nl.b<0;}
+function nlEnd(){return nl.a+nlDir()*Math.abs(nl.b);}
+function nlRange(){var m=Math.max(10,Math.abs(nl.a),Math.abs(nlEnd()));return m>10?20:10;}
+// steps: 0 = question, 1 = start shown, (2 = rewrite if two signs), then sign/direction, then one per jump, final = answer
+function nlPlan(){var p=["q","start"];if(nlTwoSigns())p.push("rewrite");p.push("dir");for(var i=1;i<=Math.abs(nl.b);i++)p.push("j"+i);p.push("ans");return p;}
+
+var svg=$("nl-svg");
+function x(n){var R=nlRange();return 50+(n+R)*(900/(2*R));}
+var Y=170;
+function nlDraw(){
+  var plan=nlPlan(),s=plan[nl.step],R=nlRange(),dir=nlDir(),n=Math.abs(nl.b);
+  var jumpsDone=0;for(var i=0;i<=nl.step;i++){if(plan[i]&&plan[i][0]==="j")jumpsDone++;}
+  var showStart=nl.step>=1, showDir=plan.indexOf("dir")<=nl.step, done=s==="ans";
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var defs=el("defs",{},svg);
+  ["r","l"].forEach(function(k){var m=el("marker",{id:"ah-"+k,viewBox:"0 0 10 10",refX:"8",refY:"5",markerWidth:"7",markerHeight:"7",orient:"auto-start-reverse"},defs);el("path",{d:"M0,0 L10,5 L0,10 z",fill:k==="r"?C("blue"):C("red")},m);});
+  // shaded negative side
+  el("rect",{x:x(-R)-20,y:Y-6,width:x(0)-x(-R)+20,height:12,fill:C("salmon"),opacity:".18",rx:6},svg);
+  // main line with arrow ends
+  el("line",{x1:22,y1:Y,x2:978,y2:Y,stroke:C("navy"),"stroke-width":3},svg);
+  el("path",{d:"M22,"+Y+" l12,-7 v14 z",fill:C("navy")},svg);
+  el("path",{d:"M978,"+Y+" l-12,-7 v14 z",fill:C("navy")},svg);
+  var fs=R>10?15:19;
+  for(var k=-R;k<=R;k++){
+    var big=k===0||(R>10&&k%5===0)||R===10;
+    el("line",{x1:x(k),y1:Y-(k===0?14:10),x2:x(k),y2:Y+(k===0?14:10),stroke:C("navy"),"stroke-width":k===0?3:2},svg);
+    if(R===10||k%2===0||k===nl.a||k===nlEnd()){
+      var t=el("text",{x:x(k),y:Y+40,"text-anchor":"middle","font-size":fs,"font-weight":k===0?700:400,fill:k<0?C("red"):C("navy"),"font-family":"inherit",style:"cursor:pointer"},svg,fmt(k));
+      (function(v){t.addEventListener("click",function(){setA(v);});})(k);
+    }
+    // invisible hit area for every tick
+    var hit=el("rect",{x:x(k)-12,y:Y-20,width:24,height:70,fill:"transparent",style:"cursor:pointer"},svg);
+    (function(v){hit.addEventListener("click",function(){setA(v);});})(k);
+  }
+  // direction banner
+  if(showDir){
+    var col=dir>0?C("blue"):C("red"), txt=dir>0?"move RIGHT →":"← move LEFT";
+    var bx=dir>0?x(nl.a)+10:x(nl.a)-10;
+    el("text",{x:Math.min(900,Math.max(100,bx)),y:78,"text-anchor":dir>0?"start":"end","font-size":24,"font-weight":700,fill:col},svg,txt);
+  }
+  // jumps
+  for(var j=0;j<jumpsDone;j++){
+    var from=nl.a+dir*j,to=from+dir, x1=x(from),x2=x(to),mx=(x1+x2)/2, h=Math.min(70,Math.abs(x2-x1)*1.1+20);
+    var colr=dir>0?C("blue"):C("red");
+    el("path",{d:"M"+x1+","+(Y-8)+" Q"+mx+","+(Y-8-h)+" "+(x2-(dir>0?3:-3))+","+(Y-10),fill:"none",stroke:colr,"stroke-width":3,"marker-end":"url(#ah-"+(dir>0?"r":"l")+")"},svg);
+    el("text",{x:mx,y:Y-8-h/2-6,"text-anchor":"middle","font-size":R>10?13:17,"font-weight":700,fill:colr},svg,String(j+1));
+  }
+  // start dot
+  if(showStart){el("circle",{cx:x(nl.a),cy:Y,r:10,fill:C("start"),stroke:"#fff","stroke-width":3},svg);}
+  // moving counter
+  var pos=nl.a+dir*jumpsDone;
+  if(showStart){
+    var g=el("g",{id:"nl-tok",transform:"translate("+x(pos)+","+(Y-30)+")"},svg);
+    el("path",{d:"M0,18 L-10,0 A12,12 0 1 1 10,0 Z",fill:done?C("answer"):C("navy")},g);
+    el("circle",{cx:0,cy:-4,r:5,fill:"#fff"},g);
+  }
+  if(done){el("circle",{cx:x(nlEnd()),cy:Y,r:10,fill:C("answer"),stroke:"#fff","stroke-width":3},svg);}
+  // counter of jumps
+  if(n>0&&jumpsDone>0&&!done){el("text",{x:500,y:238,"text-anchor":"middle","font-size":16,fill:C("muted")},svg,"Jumps: "+jumpsDone+" of "+n);}
+  // equation
+  var eq=neg(nl.a)+" "+(nl.op==="+"?"+":M)+" "+negB(nl.b)+" = "+(done?'<span class="ans">'+fmt(nlEnd())+"</span>":'<span class="q">?</span>');
+  var rwShown=nlTwoSigns()&&plan.indexOf("rewrite")<=nl.step&&nl.step>=plan.indexOf("rewrite");
+  if(rwShown){var newOp=nl.op==="+"?M:"+";eq+='<span class="rw">'+(nl.op==="+"?"+ ("+M+")  →  "+M:M+" ("+M+")  →  +")+"   so   "+fmt(nl.a)+" "+newOp+" "+Math.abs(nl.b)+"</span>";}
+  $("nl-eq").innerHTML=eq;
+  // story
+  var st="";
+  if(s==="q")st="Press <b>Next step</b> when you are ready.";
+  else if(s==="start")st="1) START: find "+fmt(nl.a)+" on the line.";
+  else if(s==="rewrite")st=nl.op==="+"?"Two signs together: adding a negative is the same as <b class=\"l\">subtracting</b>.":"Two signs together: subtracting a negative is the same as <b class=\"r\">adding</b>.";
+  else if(s==="dir")st="2) SIGN: "+(dir>0?"<b class=\"r\">add means move RIGHT →</b>":"<b class=\"l\">subtract means move LEFT ←</b>")+(n===0?"… but the number is 0, so we don't move!":" "+n+" space"+(n===1?"":"s")+".");
+  else if(s[0]==="j")st="3) JUMPS: "+Array.apply(null,Array(jumpsDone)).map(function(_,i){return i+1;}).join(", ")+(jumpsDone<n?"…":"")+"  Now on <b>"+fmt(pos)+"</b>.";
+  else if(s==="ans")st="We land on <b>"+fmt(nlEnd())+"</b>.  "+fmt(nl.a)+" "+(nl.op==="+"?"+":M)+" "+fmtB(nl.b)+" = "+fmt(nlEnd())+(dir>0?"  (the answer got bigger)":(n?"  (the answer got smaller)":""));
+  $("nl-story").innerHTML=st;
+  $("nl-a").textContent=fmt(nl.a);$("nl-b").textContent=fmt(Math.abs(nl.b));
+  $("nl-bneg").checked=nl.b<0;
+  $("nl-op-add").setAttribute("aria-pressed",nl.op==="+");$("nl-op-sub").setAttribute("aria-pressed",nl.op==="-");
+  $("nl-back").disabled=nl.step===0;$("nl-next").disabled=done;
+  var e=nlEnd();$("nl-warn").textContent=Math.abs(e)>20?"That answer is off the line. Try a smaller number.":"";
+  if(Math.abs(e)>20){$("nl-next").disabled=true;$("nl-play").disabled=true;}else $("nl-play").disabled=done;
+}
+function hop(from,to,done){
+  var tok=document.getElementById("nl-tok");if(!tok){done();return;}
+  var x1=x(from),x2=x(to),h=Math.min(70,Math.abs(x2-x1)*1.1+20);
+  nl.cancel=tween(420,function(t){var xx=x1+(x2-x1)*t, yy=(Y-30)-Math.sin(Math.PI*t)*h*0.55;tok.setAttribute("transform","translate("+xx+","+yy+")");},done);
+}
+function nlNext(cb){
+  var plan=nlPlan();if(nl.step>=plan.length-1){cb&&cb();return;}
+  var nxt=plan[nl.step+1];
+  if(nxt[0]==="j"){var j=+nxt.slice(1),d=nlDir();var from=nl.a+d*(j-1);hop(from,from+d,function(){nl.step++;nlDraw();cb&&cb();});}
+  else{nl.step++;nlDraw();cb&&cb();}
+}
+function nlStop(){if(nl.timer){clearTimeout(nl.timer);nl.timer=null;}if(nl.cancel){nl.cancel();nl.cancel=null;}}
+function nlPlay(){nlStop();var plan=nlPlan();(function go(){if(nl.step>=nlPlan().length-1){nl.timer=null;return;}nlNext(function(){var nx=nlPlan()[nl.step+1];nl.timer=setTimeout(go,nx&&nx[0]==="j"?120:900);});})();}
+function nlReset(){nlStop();nl.step=0;nlDraw();}
+function clampA(v){return Math.max(-20,Math.min(20,v));}
+function setA(v){nl.a=clampA(v);nlStop();nl.step=1;nlDraw();sel.value="";}
+function setB(abs,isNeg){abs=Math.max(0,Math.min(20,abs));nl.b=isNeg?-abs:abs;nlReset();sel.value="";}
+$("nl-a-dn").onclick=function(){setA(nl.a-1);};$("nl-a-up").onclick=function(){setA(nl.a+1);};
+$("nl-b-dn").onclick=function(){setB(Math.abs(nl.b)-1,nl.b<0);};$("nl-b-up").onclick=function(){setB(Math.abs(nl.b)+1,nl.b<0);};
+$("nl-bneg").onchange=function(){setB(Math.abs(nl.b),this.checked);};
+$("nl-op-add").onclick=function(){nl.op="+";nlReset();sel.value="";};$("nl-op-sub").onclick=function(){nl.op="-";nlReset();sel.value="";};
+$("nl-next").onclick=function(){nlStop();nlNext();};
+$("nl-back").onclick=function(){nlStop();if(nl.step>0){nl.step--;nlDraw();}};
+$("nl-play").onclick=nlPlay;$("nl-reset").onclick=nlReset;
+sel.onchange=function(){if(this.value==="")return;var p=nlPresets[+this.value];nl.a=p[1];nl.op=p[2];nl.b=p[3];nlReset();};
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function rand(level){var a,op,b,e;do{
+  if(level===1){a=ri(-8,-1);op=Math.random()<.5?"+":"-";b=ri(1,8);}
+  else if(level===2){a=ri(-8,8);op="+";b=-ri(1,8);if(Math.random()<.3){op="-";b=ri(1,8);}}
+  else{a=ri(-8,8);op="-";b=-ri(1,8);}
+  e=a+((op==="+")===(b>=0)?1:-1)*Math.abs(b);}while(Math.abs(e)>10||(a===0));
+  nl.a=a;nl.op=op;nl.b=b;sel.value="";nlReset();}
+$("nl-rand-m").onclick=function(){rand(1);};$("nl-rand-md").onclick=function(){rand(2);};$("nl-rand-h").onclick=function(){rand(3);};
+
+/* ================= THERMOMETER ================= */
+var th={a:-3,dir:1,b:5,step:0,timer:null,cancel:null,shown:-3};
+var thPresets=[
+ ["Norwich","At 6am it was −3°C in Norwich. By lunchtime it had warmed up by 5 degrees.",-3,1,5],
+ ["Do Now c)","It is 5°C. It falls by 7°C.",5,-1,7],
+ ["Edinburgh","At midnight it was 2°C in Edinburgh. Overnight it cooled down by 6 degrees.",2,-1,6],
+ ["The freezer","A freezer is at −8°C. The door is left open and it warms up by 9 degrees.",-8,1,9],
+ ["Ski trip","In the Alps it is −4°C at the top of the slope. At the bottom it is 7 degrees warmer.",-4,1,7],
+ ["Snow day","At 3pm it was 1°C. By 9pm it had dropped by 5 degrees.",1,-1,5],
+ ["Your own","Make your own: set the start and the change below.",0,1,3]
+];
+var tsel=$("th-preset");
+thPresets.forEach(function(p,i){var o=document.createElement("option");o.value=i;o.textContent=p[0];tsel.appendChild(o);});
+var thScn=thPresets[0];
+var TS=$("th-svg"), TX=135, TW=46, TOP=50, BOT=530;
+function ty(t){return BOT-(t+10)*((BOT-TOP)/20);}
+function thEnd(){return th.a+th.dir*th.b;}
+function thDraw(){
+  var R=10, end=thEnd(), done=th.step===th.b+1, moved=Math.max(0,Math.min(th.b,th.step-1));
+  while(TS.firstChild)TS.removeChild(TS.firstChild);
+  var defs=el("defs",{},TS);
+  ["u","d"].forEach(function(k){var m=el("marker",{id:"tah-"+k,viewBox:"0 0 10 10",refX:"8",refY:"5",markerWidth:"6",markerHeight:"6",orient:"auto-start-reverse"},defs);el("path",{d:"M0,0 L10,5 L0,10 z",fill:k==="u"?C("warm"):C("cool")},m);});
+  // freezing zone
+  el("rect",{x:TX+TW/2+8,y:ty(0),width:150,height:ty(-10)-ty(0)+6,fill:C("sky"),rx:6},TS);
+  var bfx=TX+TW/2+146,bfy=(ty(0)+ty(-10))/2;el("text",{x:bfx,y:bfy,"text-anchor":"middle","font-size":14,fill:C("cool"),"font-weight":600,transform:"rotate(-90 "+bfx+" "+bfy+")"},TS,"below freezing");
+  // tube
+  el("rect",{x:TX-TW/2,y:TOP-24,width:TW,height:BOT-TOP+70,rx:TW/2,fill:"#fff",stroke:C("navy"),"stroke-width":3},TS);
+  el("circle",{cx:TX,cy:BOT+70,r:40,fill:"#fff",stroke:C("navy"),"stroke-width":3},TS);
+  el("circle",{cx:TX,cy:BOT+70,r:31,fill:C("warm")},TS);
+  var merc=el("rect",{id:"th-merc",x:TX-12,y:ty(th.shown),width:24,height:(BOT+60)-ty(th.shown),fill:C("warm"),rx:4},TS);
+  // scale
+  for(var t=-R;t<=R;t++){
+    var y=ty(t), major=true;
+    el("line",{x1:TX+TW/2+6,y1:y,x2:TX+TW/2+(t===0?40:24),y2:y,stroke:C("navy"),"stroke-width":t===0?3:2},TS);
+    var lab=el("text",{x:TX+TW/2+48,y:y+6,"font-size":t===0?19:17,"font-weight":t===0?700:400,fill:t<0?C("red"):C("navy"),style:"cursor:pointer"},TS,fmt(t)+"°");
+    var hit=el("rect",{x:TX-TW/2,y:y-11,width:160,height:22,fill:"transparent",style:"cursor:pointer"},TS);
+    (function(v){hit.addEventListener("click",function(){thSetA(v);});lab.addEventListener("click",function(){thSetA(v);});})(t);
+  }
+  
+  // jumps on left
+  var col=th.dir>0?C("warm"):C("cool");
+  for(var j=0;j<moved;j++){
+    var f=th.a+th.dir*j, to=f+th.dir, y1=ty(f), y2=ty(to);
+    el("path",{d:"M"+(TX-TW/2-6)+","+y1+" Q"+(TX-TW/2-62)+","+((y1+y2)/2)+" "+(TX-TW/2-8)+","+(y2+(th.dir>0?3:-3)),fill:"none",stroke:col,"stroke-width":3,"marker-end":"url(#tah-"+(th.dir>0?"u":"d")+")"},TS);
+    el("text",{x:TX-TW/2-50,y:(y1+y2)/2+5,"text-anchor":"end","font-size":14,"font-weight":700,fill:col},TS,String(j+1));
+  }
+  // start marker
+  if(th.step>=1){el("path",{d:"M"+(TX-TW/2-2)+","+ty(th.a)+" l-14,-8 v16 z",fill:C("start")},TS);}
+  if(done){el("circle",{cx:TX+TW/2+14,cy:ty(end),r:7,fill:C("answer")},TS);}
+  // readout
+  var rd=$("th-read");rd.textContent=fmt(th.shown)+"°C";rd.className="readout"+(th.shown<0?" neg":"");
+  var dirWord=th.dir>0?"warms up":"cools down";
+  $("th-scn").innerHTML='<span class="city">'+thScn[0]+'</span>'+thScn[1].replace(/−/g,M)+'<br><b>What is the new temperature?</b>';
+  var s;
+  if(th.step===0)s="Press <b>Next degree</b> when you are ready.";
+  else if(th.step===1)s="Start at <b>"+fmt(th.a)+"°C</b>. It "+(th.dir>0?"<b class=\"up\">warms up, so we go UP ↑</b>":"<b class=\"down\">cools down, so we go DOWN ↓</b>")+" "+th.b+" degree"+(th.b===1?"":"s")+".";
+  else if(!done)s="Degrees counted: "+moved+" of "+th.b+".  Now <b>"+fmt(th.shown)+"°C</b>.";
+  else s="New temperature: <b>"+fmt(end)+"°C</b>.  "+fmt(th.a)+" "+(th.dir>0?"+":M)+" "+th.b+" = "+fmt(end);
+  $("th-story").innerHTML=s;
+  $("th-a").textContent=fmt(th.a);$("th-b").textContent=th.b;
+  $("th-up").setAttribute("aria-pressed",th.dir>0);$("th-down").setAttribute("aria-pressed",th.dir<0);
+  var off=Math.abs(end)>10;$("th-warn").textContent=off?"That goes off the thermometer (−10°C to 10°C). Try a smaller change.":"";
+  $("th-back").disabled=th.step===0;$("th-next").disabled=done||off;$("th-play").disabled=done||off;
+}
+function thAnimTo(target,cb){var from=th.shown;var m=document.getElementById("th-merc");
+  th.cancel=tween(380,function(t){var v=from+(target-from)*t;m.setAttribute("y",ty(v));m.setAttribute("height",(BOT+60)-ty(v));},function(){th.shown=target;cb&&cb();});}
+function thNext(cb){
+  if(th.step>th.b){cb&&cb();return;}
+  if(th.step===0){th.step=1;th.shown=th.a;thDraw();cb&&cb();return;}
+  if(th.step<=th.b){var tgt=th.a+th.dir*th.step;thAnimTo(tgt,function(){th.step++;if(th.step===th.b+1){}thDraw();cb&&cb();});}
+}
+// steps: 0 question, 1 start, 2..b+1 each degree (b+1 = done)
+function thStop(){if(th.timer){clearTimeout(th.timer);th.timer=null;}if(th.cancel){th.cancel();th.cancel=null;}}
+function thPlay(){thStop();(function go(){if(th.step>th.b){th.timer=null;return;}thNext(function(){th.timer=setTimeout(go,th.step===1?900:150);});})();}
+function thReset(){thStop();th.step=0;th.shown=th.a;thDraw();}
+function thBack(){thStop();if(th.step===0)return;th.step--;th.shown=th.step<=1?th.a:th.a+th.dir*(th.step-1);thDraw();}
+function custom(){thScn=["Your own","It is "+fmt(th.a)+"°C. It "+(th.dir>0?"warms up":"cools down")+" by "+th.b+" degree"+(th.b===1?"":"s")+"."];tsel.value=String(thPresets.length-1);}
+function thSetA(v){th.a=Math.max(-10,Math.min(10,v));custom();thStop();th.step=1;th.shown=th.a;thDraw();}
+$("th-a-dn").onclick=function(){thSetA(th.a-1);};$("th-a-up").onclick=function(){thSetA(th.a+1);};
+$("th-b-dn").onclick=function(){th.b=Math.max(0,th.b-1);custom();thReset();};$("th-b-up").onclick=function(){th.b=Math.min(20,th.b+1);custom();thReset();};
+$("th-up").onclick=function(){th.dir=1;custom();thReset();};$("th-down").onclick=function(){th.dir=-1;custom();thReset();};
+$("th-next").onclick=function(){thStop();thNext();};$("th-back").onclick=thBack;$("th-play").onclick=thPlay;$("th-reset").onclick=thReset;
+tsel.onchange=function(){var p=thPresets[+this.value];thScn=p;th.a=p[2];th.dir=p[3];th.b=p[4];if(p[0]==="Your own")custom();thReset();};
+
+/* ================= TABS, KEYS, FULL SCREEN ================= */
+var views={"number-line":["view-line","tab-line"],"thermometer":["view-thermo","tab-thermo"]};
+var current="number-line";
+function show(name){if(!views[name])name="number-line";current=name;for(var k in views){var on=k===name;$(views[k][0]).hidden=!on;$(views[k][1]).setAttribute("aria-selected",on);}}
+document.querySelectorAll(".tab").forEach(function(b){b.onclick=function(){var v=b.getAttribute("data-view");try{history.replaceState(null,"","#"+v);}catch(e){location.hash=v;}show(v);};});
+window.addEventListener("hashchange",function(){show(location.hash.slice(1));});
+document.addEventListener("keydown",function(e){
+  var tg=e.target&&e.target.tagName;if(tg==="SELECT"||tg==="INPUT")return;
+  var isLine=current==="number-line";
+  if(e.key==="ArrowRight"||e.key==="PageDown"||e.key===" "){e.preventDefault();if(isLine){nlStop();nlNext();}else{thStop();thNext();}}
+  else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();if(isLine)$("nl-back").click();else thBack();}
+  else if(e.key==="Enter"&&tg!=="BUTTON"){e.preventDefault();isLine?nlPlay():thPlay();}
+  else if(e.key==="r"||e.key==="R"){isLine?nlReset():thReset();}
+});
+$("fs").onclick=function(){var d=document.documentElement;try{var p=(d.requestFullscreen||d.webkitRequestFullscreen).call(d);if(p&&p.catch)p.catch(function(){});}catch(e){}};
+
+show(location.hash.slice(1)||"number-line");
+nlDraw();thReset();
+})();
+</script>
+</body></html>
